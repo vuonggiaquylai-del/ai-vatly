@@ -13,8 +13,14 @@ type Message = {
 };
 
 const MAX_INPUT_HEIGHT = 200;
-// AI mở đầu câu trả lời bằng chuỗi này khi người dùng muốn xem thí nghiệm
-const SHOW_DENSITY_MARKER = "[SHOW_DENSITY]";
+export type ExperimentKind = "density" | "current" | "heat";
+
+// AI mở đầu câu trả lời bằng một trong các chuỗi này khi cần hiện thí nghiệm
+const MARKERS: Record<ExperimentKind, string> = {
+  density: "[SHOW_DENSITY]",
+  current: "[SHOW_CURRENT]",
+  heat: "[SHOW_HEAT]",
+};
 
 // remark-math chỉ hiểu $...$ và $$...$$, nên đổi \(...\) và \[...\] sang dạng đó
 function normalizeMath(text: string) {
@@ -122,12 +128,12 @@ function AiActions({ text }: { text: string }) {
   );
 }
 
-export default function ChatPanel({ onShowExperiment }: { onShowExperiment?: () => void }) {
+export default function ChatPanel({ onShowExperiment }: { onShowExperiment?: (kind: ExperimentKind) => void }) {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 0,
       role: "ai",
-      text: "Xin chào! Mình là trợ lý AI. Hãy hỏi mình về khối lượng riêng hoặc thí nghiệm bên cạnh nhé.",
+      text: "Xin chào! Mình là trợ lý AI. Hãy hỏi mình về khối lượng riêng, tác dụng của dòng điện, sự dẫn nhiệt hoặc thí nghiệm bên cạnh nhé.",
     },
   ]);
   const [input, setInput] = useState("");
@@ -191,13 +197,18 @@ export default function ChatPanel({ onShowExperiment }: { onShowExperiment?: () 
         raw += chunk;
 
         // Marker có thể bị cắt giữa các chunk: chờ đủ rồi mới hiện chữ
-        if (SHOW_DENSITY_MARKER.startsWith(raw.trimStart())) continue;
-        if (raw.includes(SHOW_DENSITY_MARKER) && !shown) {
-          shown = true;
-          onShowExperiment?.();
+        const head = raw.trimStart();
+        if (Object.values(MARKERS).some((m) => m.startsWith(head))) continue;
+        let display = raw;
+        for (const [kind, marker] of Object.entries(MARKERS) as [ExperimentKind, string][]) {
+          if (!display.includes(marker)) continue;
+          if (!shown) {
+            shown = true;
+            onShowExperiment?.(kind);
+          }
+          display = display.replace(marker, "");
         }
-        const display = raw.replace(SHOW_DENSITY_MARKER, "").trimStart();
-        setAiText(() => display);
+        setAiText(() => display.trimStart());
       }
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Không rõ lỗi";
