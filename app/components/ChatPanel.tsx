@@ -13,13 +13,14 @@ type Message = {
 };
 
 const MAX_INPUT_HEIGHT = 200;
-export type ExperimentKind = "density" | "current" | "heat";
+export type ExperimentKind = "density" | "current" | "heat" | "light";
 
 // AI mở đầu câu trả lời bằng một trong các chuỗi này khi cần hiện thí nghiệm
 const MARKERS: Record<ExperimentKind, string> = {
   density: "[SHOW_DENSITY]",
   current: "[SHOW_CURRENT]",
   heat: "[SHOW_HEAT]",
+  light: "[SHOW_LIGHT]",
 };
 
 // remark-math chỉ hiểu $...$ và $$...$$, nên đổi \(...\) và \[...\] sang dạng đó
@@ -133,7 +134,7 @@ export default function ChatPanel({ onShowExperiment }: { onShowExperiment?: (ki
     {
       id: 0,
       role: "ai",
-      text: "Xin chào! Mình là trợ lý AI. Hãy hỏi mình về khối lượng riêng, tác dụng của dòng điện, sự dẫn nhiệt hoặc thí nghiệm bên cạnh nhé.",
+      text: "Xin chào! Mình là trợ lý AI. Hãy hỏi mình về khối lượng riêng, tác dụng của dòng điện, sự dẫn nhiệt, tia sáng hoặc thí nghiệm bên cạnh nhé.",
     },
   ]);
   const [input, setInput] = useState("");

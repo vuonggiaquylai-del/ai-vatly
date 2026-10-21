@@ -19,7 +19,7 @@ export default function Home() {
       {/* Nửa phải: ảnh minh hoạ, hoặc thí nghiệm tương ứng */}
       <section
         className={
-          experiment === "current" || experiment === "heat"
+          experiment === "current" || experiment === "heat" || experiment === "light"
             ? "order-2 h-screen px-2.5 pb-2.5 lg:order-1 lg:w-1/2 lg:px-[15px] lg:pb-[15px]"
             : "order-1 lg:order-2 lg:h-full lg:w-1/2 lg:overflow-y-auto"
         }
@@ -36,6 +36,12 @@ export default function Home() {
           <iframe
             src="/api/templates/dan-nhiet"
             title="Mô phỏng sự dẫn nhiệt"
+            className="h-[600px] w-full border-0 lg:h-full"
+          />
+        ) : experiment === "light" ? (
+          <iframe
+            src="/api/templates/tia-sang"
+            title="Mô phỏng tia sáng"
             className="h-[600px] w-full border-0 lg:h-full"
           />
         ) : (
